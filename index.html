@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Directory</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --relentless-gold: #BEAF87;
+            --obsessed-grey: #252526;
+            --digital-dark-gold: #746649;
+            --digital-black: #121212;
+            --white: #FFFFFF;
+            --digital-medium-grey: #727273;
+            --digital-link-blue: #517394;
+            --digital-link-light-blue: #6E8FAF;
+            --digital-highlight-red: #8D312E;
+            --relentless-gold-medium: #DED7C3;
+            --relentless-gold-light: #F8F7F2;
+            --obsessed-grey-medium: #C4C4C5;
+            --obsessed-grey-light: #F4F4F6;
+            --digital-dark-gold-medium: #B9B2A3;
+            --digital-dark-gold-light: #F1EFEC;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--obsessed-grey-light);
+            color: var(--obsessed-grey);
+        }
+
+        .loader {
+            border: 4px solid var(--digital-medium-grey);
+            border-top: 4px solid var(--relentless-gold);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .award-badge {
+            background-color: var(--relentless-gold);
+            color: var(--obsessed-grey);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .agent-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .headshot-container {
+            padding-top: 100%;
+            position: relative;
+            background-color: var(--obsessed-grey-light);
+        }
+
+        .headshot {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-avatar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--obsessed-grey-light);
+            font-size: 3rem;
+            color: var(--digital-medium-grey);
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .image-action-btn {
+            background-color: var(--white);
+            color: var(--digital-link-blue);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .image-action-btn:hover {
+            background-color: var(--digital-link-blue);
+            color: var(--white);
+        }
+
+        .agent-info {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-name {
+            font-weight: bold;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+            color: var(--obsessed-grey);
+        }
+
+        .agent-role {
+            color: var(--digital-link-blue);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .accreditation {
+            background-color: var(--relentless-gold-light);
+            color: var(--digital-dark-gold);
+            padding: 0 4px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            display: inline-block;
+        }
+
+        .languages {
+            background-color: var(--digital-dark-gold-light);
+            color: var(--digital-dark-gold);
+            padding: 0 4px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+
+        .license-info {
+            background-color: var(--obsessed-grey-light);
+            color: var(--obsessed-grey);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+
+        .contact-info {
+            font-size: 0.875rem;
+            margin-top: auto;
+        }
+
+        .contact-info a {
+            color: var(--digital-link-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-info a:hover {
+            color: var(--digital-link-light-blue);
+            text-decoration: underline;
+        }
+
+        .contact-icon {
+            margin-right: 0.5rem;
+        }
+
+        .filters {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input, .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--digital-medium-grey);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--digital-link-blue);
+            box-shadow: 0 0 0 2px rgba(81, 115, 148, 0.2);
+        }
+
+        .btn {
+            background-color: var(--digital-link-blue);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--digital-link-light-blue);
+        }
+
+        .footer {
+            background-color: var(--obsessed-grey);
+            color: var(--white);
+            padding: 1.5rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .footer-note {
+            color: var(--obsessed-grey-medium);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Upload Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .close-modal {
+            color: var(--digital-medium-grey);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: var(--obsessed-grey);
+        }
+
+        .drop-area {
+            border: 2px dashed var(--digital-medium-grey);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .drop-area:hover, .drop-area.dragover {
+            background-color: var(--obsessed-grey-light);
+        }
+
+        .file-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--obsessed-grey-light);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--obsessed-grey);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--digital-highlight-red);
+        }
+
+        .upload-btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #csv-file-input {
+            display: none;
+        }
+
+        .image-action-tooltip {
+            position: absolute;
+            background-color: var(--obsessed-grey);
+            color: var(--white);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            bottom: 48px;
+            right: 10px;
+            white-space: nowrap;
+            display: none;
+            z-index: 10;
+        }
+
+        .image-action-btn:hover + .image-action-tooltip {
+            display: block;
+        }
+
+        /* Preloader animation for image downloads */
+        .downloading {
+            position: relative;
+        }
+
+        .downloading::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+        }
+
+        .upload-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--relentless-gold);
+            color: var(--obsessed-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--relentless-gold-medium);
+        }
+
+        .upload-btn i {
+            font-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .filters-selects {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .filter-select {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white p-4 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold" style="color: var(--obsessed-grey);">Agent Directory</h1>
+            <p class="text-sm" style="color: var(--digital-medium-grey);" id="agent-count"></p>
+        </div>
+    </header>
+
+    <main class="container p-4 mx-auto">
+        <!-- Filters -->
+        <div class="filters">
+            <div class="flex flex-col filters-container gap-4 md:flex-row md:items-center md:justify-between">
+                <div class="w-full md:w-1/3 search-container">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="Search by name, email, or office..." 
+                        class="w-full search-input"
+                    >
+                </div>
+                
+                <div class="flex flex-wrap filters-selects gap-2">
+                    <select id="region-filter" class="filter-select">
+                        <option value="All">All Regions</option>
+                    </select>
+                    
+                    <select id="role-filter" class="filter-select">
+                        <option value="All">All Roles</option>
+                    </select>
+                    
+                    <select id="license-state-filter" class="filter-select">
+                        <option value="All">All License States</option>
+                    </select>
+                    
+                    <select id="award-filter" class="filter-select">
+                        <option value="All">All Agents</option>
+                        <option value="Yes">Award Winners</option>
+                        <option value="No">Non-Award Winners</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Count -->
+        <div class="mb-4">
+            <p id="results-count" style="color: var(--digital-medium-grey);"></p>
+        </div>
+        
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center py-12">
+            <div class="loader"></div>
+            <p class="text-lg mt-4" style="color: var(--obsessed-grey);">Loading Agent Directory...</p>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="error-container" class="p-8 rounded-lg text-center hidden max-w-xl mx-auto" style="background-color: var(--obsessed-grey-light);">
+            <div class="text-4xl mb-4" style="color: var(--digital-highlight-red);">⚠️</div>
+            <h2 class="text-xl font-bold mb-4" style="color: var(--obsessed-grey);">Error Loading Directory</h2>
+            <p id="error-message" class="mb-4" style="color: var(--digital-medium-grey);"></p>
+            <button 
+                class="btn"
+                onclick="window.location.reload()"
+            >
+                Try Again
+            </button>
+        </div>
+        
+        <!-- Agent Grid -->
+        <div id="agent-grid" class="grid grid-cols-1 gap-6 lg:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4"></div>
+        
+        <!-- No Results Message -->
+        <div id="no-results" class="p-12 text-center hidden">
+            <p class="text-lg" style="color: var(--digital-medium-grey);">
+                No agents match your search criteria. Please try different filters.
+            </p>
+        </div>
+    </main>
+    
+    <!-- Upload CSV Button -->
+    <div class="upload-btn" id="upload-btn">
+        <i class="fa-plus fas"></i>
+    </div>
+    
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2 class="text-xl font-bold mb-4" style="color: var(--obsessed-grey);">Upload CSV File</h2>
+            <p style="color: var(--digital-medium-grey);">Upload a CSV file to add more agents to the directory. The file must have the same column structure as the existing data.</p>
+            
+            <div id="drop-area" class="drop-area">
+                <i class="text-3xl fa-cloud-upload-alt fas mb-2" style="color: var(--digital-medium-grey);"></i>
+                <p>Drag & drop your CSV file here or click to browse</p>
+                <input type="file" id="csv-file-input" accept=".csv" />
+            </div>
+            
+            <div id="file-info" class="file-info hidden">
+                <p id="file-name"></p>
+                <p id="file-size"></p>
+            </div>
+            
+            <div class="upload-btn-container">
+                <button id="upload-file-btn" class="btn" disabled>Upload & Process</button>
+                <button id="cancel-upload-btn" class="btn" style="background-color: var(--digital-medium-grey);">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+    
+    <footer class="footer">
+        <div class="container mx-auto">
+            <p class="mb-2">Agent Directory - © <span id="current-year"></span></p>
+            <p class="footer-note">Generated from Merged and Deduplicated Roster</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // Brand colors for reference in JavaScript
+        const colors = {
+            primary: {
+                relentlessGold: '#BEAF87',
+                obsessedGrey: '#252526',
+                digitalDarkGold: '#746649',
+                digitalBlack: '#121212',
+                white: '#FFFFFF',
+                digitalMediumGrey: '#727273'
+            },
+            secondary: {
+                digitalLinkBlue: '#517394',
+                digitalLinkLightBlue: '#6E8FAF',
+                digitalHighlightRed: '#8D312E'
+            },
+            tints: {
+                relentlessGoldMedium: '#DED7C3',
+                relentlessGoldLight: '#F8F7F2',
+                obsessedGreyMedium: '#C4C4C5',
+                obsessedGreyLight: '#F4F4F6',
+                digitalDarkGoldMedium: '#B9B2A3',
+                digitalDarkGoldLight: '#F1EFEC'
+            }
+        };
+
+        // Expected CSV columns (updated with new fields)
+        const expectedColumns = [
+            "name", "headshot", "role", "region", "office_name", "office_addres", 
+            "cell_phone", "email", "license_number", "accreditations", 
+            "2024_award_winner", "2024_award_group", "license_state", "languages"
+        ];
+
+        // Application state
+        let agents = [];
+        let filteredAgents = [];
+        let filters = {
+            region: 'All',
+            role: 'All',
+            licenseState: 'All',
+            awardWinner: 'All'
+        };
+        let searchTerm = '';
+        let selectedFile = null;
+
+        // DOM Elements
+        const loadingElement = document.getElementById('loading');
+        const errorContainer = document.getElementById('error-container');
+        const errorMessage = document.getElementById('error-message');
+        const agentGrid = document.getElementById('agent-grid');
+        const noResults = document.getElementById('no-results');
+        const agentCount = document.getElementById('agent-count');
+        const resultsCount = document.getElementById('results-count');
+        const searchInput = document.getElementById('search-input');
+        const regionFilter = document.getElementById('region-filter');
+        const roleFilter = document.getElementById('role-filter');
+        const licenseStateFilter = document.getElementById('license-state-filter');
+        const awardFilter = document.getElementById('award-filter');
+        const currentYear = document.getElementById('current-year');
+        const uploadBtn = document.getElementById('upload-btn');
+        const uploadModal = document.getElementById('upload-modal');
+        const closeModal = document.getElementById('close-modal');
+        const dropArea = document.getElementById('drop-area');
+        const csvFileInput = document.getElementById('csv-file-input');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const uploadFileBtn = document.getElementById('upload-file-btn');
+        const cancelUploadBtn = document.getElementById('cancel-upload-btn');
+        const toast = document.getElementById('toast');
+
+        // Set current year in footer
+        currentYear.textContent = new Date().getFullYear();
+
+        // Load CSV data
+        async function loadCSV() {
+            try {
+                // Fetch CSV file
+                const response = await fetch('/agents.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                
+                // Parse CSV
+                parseCSV(csvText, false);
+            } catch (error) {
+                showError(`Error loading CSV file: ${error.message}`);
+            }
+        }
+
+        // Parse CSV data
+        function parseCSV(csvText, isUpload = false) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (isUpload) {
+                        // Validate CSV structure
+                        const uploadedColumns = results.meta.fields;
+                        
+                        // Check if uploaded CSV has some of the expected columns
+                        const hasExpectedColumns = expectedColumns.some(col => 
+                            uploadedColumns.includes(col) || 
+                            uploadedColumns.includes(col.replace('_', ' '))
+                        );
+                        
+                        if (!hasExpectedColumns) {
+                            showToast(`Error: CSV structure doesn't match expected format`, 'error');
+                            return;
+                        }
+                        
+                        // Normalize column names (convert spaces to underscores)
+                        const normalizedData = results.data.map(row => {
+                            const normalizedRow = {};
+                            for (const key in row) {
+                                // Convert spaces to underscores and lowercase
+                                const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+                                normalizedRow[normalizedKey] = row[key];
+                            }
+                            return normalizedRow;
+                        });
+                        
+                        // Check for duplicates and merge data
+                        const newAgents = normalizedData.filter(newAgent => {
+                            // Check if agent already exists by name and email
+                            return !agents.some(existingAgent => 
+                                (existingAgent.name && existingAgent.name.toLowerCase() === (newAgent.name || '').toLowerCase()) && 
+                                (existingAgent.email && existingAgent.email.toLowerCase() === (newAgent.email || '').toLowerCase())
+                            );
+                        });
+                        
+                        if (newAgents.length === 0) {
+                            showToast('No new agents found in the uploaded CSV.', 'error');
+                            return;
+                        }
+                        
+                        // Add new agents to the data
+                        agents = [...agents, ...newAgents];
+                        showToast(`Successfully added ${newAgents.length} new agents!`, 'success');
+                    } else {
+                        // Normalize column names for initial load too
+                        agents = results.data.map(row => {
+                            const normalizedRow = {};
+                            for (const key in row) {
+                                // Convert spaces to underscores and lowercase
+                                const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+                                normalizedRow[normalizedKey] = row[key];
+                            }
+                            return normalizedRow;
+                        });
+                    }
+                    
+                    filteredAgents = [...agents];
+                    
+                    // Update agent count
+                    agentCount.textContent = `${agents.length} Agents Available`;
+                    
+                    // Populate filter dropdowns
+                    populateFilters();
+                    
+                    // Render agents
+                    renderAgents();
+                    
+                    // Hide loading indicator
+                    loadingElement.classList.add('hidden');
+                    
+                    // Set up event listeners if initial load
+                    if (!isUpload) {
+                        setupEventListeners();
+                    } else {
+                        // Clear upload form
+                        clearUploadForm();
+                        closeUploadModal();
+                    }
+                },
+                error: function(error) {
+                    if (isUpload) {
+                        showToast(`Error parsing CSV: ${error.message}`, 'error');
+                    } else {
+                        showError(`Error parsing CSV: ${error.message}`);
+                    }
+                }
+            });
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            // Clear existing options except for the "All" option
+            regionFilter.innerHTML = '<option value="All">All Regions</option>';
+            roleFilter.innerHTML = '<option value="All">All Roles</option>';
+            licenseStateFilter.innerHTML = '<option value="All">All License States</option>';
+            
+            // Extract unique regions
+            const uniqueRegions = [...new Set(agents
+                .map(agent => agent.region)
+                .filter(Boolean)
+            )];
+            
+            uniqueRegions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionFilter.appendChild(option);
+            });
+            
+            // Extract unique roles
+            const uniqueRoles = [...new Set(agents
+                .map(agent => agent.role)
+                .filter(Boolean)
+            )];
+            
+            uniqueRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                roleFilter.appendChild(option);
+            });
+            
+            // Extract unique license states
+            const uniqueLicenseStates = [...new Set(agents
+                .map(agent => agent.license_state)
+                .filter(Boolean)
+            )];
+            
+            uniqueLicenseStates.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                licenseStateFilter.appendChild(option);
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', e => {
+                searchTerm = e.target.value;
+                filterAgents();
+            });
+            
+            // Region filter
+            regionFilter.addEventListener('change', e => {
+                filters.region = e.target.value;
+                filterAgents();
+            });
+            
+            // Role filter
+            roleFilter.addEventListener('change', e => {
+                filters.role = e.target.value;
+                filterAgents();
+            });
+            
+            // License State filter
+            licenseStateFilter.addEventListener('change', e => {
+                filters.licenseState = e.target.value;
+                filterAgents();
+            });
+            
+            // Award filter
+            awardFilter.addEventListener('change', e => {
+                filters.awardWinner = e.target.value;
+                filterAgents();
+            });
+            
+            // Upload button
+            uploadBtn.addEventListener('click', openUploadModal);
+            
+            // Close modal
+            closeModal.addEventListener('click', closeUploadModal);
+            window.addEventListener('click', e => {
+                if (e.target === uploadModal) {
+                    closeUploadModal();
+                }
+            });
+            
+            // Cancel upload
+            cancelUploadBtn.addEventListener('click', () => {
+                clearUploadForm();
+                closeUploadModal();
+            });
+            
+            // File drop area
+            dropArea.addEventListener('click', () => {
+                csvFileInput.click();
+            });
+            
+            dropArea.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+            
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('dragover');
+            });
+            
+            dropArea.addEventListener('drop', e => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // File input change
+            csvFileInput.addEventListener('change', e => {
+                if (e.target.files.length) {
+                    handleFileSelection(e.target.files[0]);
+                }
+            });
+            
+            // Upload file button
+            uploadFileBtn.addEventListener('click', processUploadedFile);
+        }
+
+        // Filter agents
+        function filterAgents() {
+            filteredAgents = agents.filter(agent => {
+                // Search filtering
+                const searchMatch = 
+                    searchTerm === '' || 
+                    (agent.name && agent.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (agent.email && agent.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (agent.office_name && agent.office_name.toLowerCase().includes(searchTerm.toLowerCase()));
+                
+                // Filter by region
+                const regionMatch = 
+                    filters.region === 'All' || 
+                    agent.region === filters.region;
+                
+                // Filter by role
+                const roleMatch = 
+                    filters.role === 'All' || 
+                    agent.role === filters.role;
+                
+                // Filter by license state
+                const licenseStateMatch = 
+                    filters.licenseState === 'All' || 
+                    agent.license_state === filters.licenseState;
+                
+                // Filter by award winner
+                const awardMatch = 
+                    filters.awardWinner === 'All' || 
+                    (filters.awardWinner === 'Yes' && agent['2024_award_winner']) || 
+                    (filters.awardWinner === 'No' && !agent['2024_award_winner']);
+                
+                return searchMatch && regionMatch && roleMatch && licenseStateMatch && awardMatch;
+            });
+            
+            // Update results count
+            resultsCount.textContent = `Showing ${filteredAgents.length} of ${agents.length} agents`;
+            
+            // Render filtered agents
+            renderAgents();
+        }
+
+        // Render agents
+        function renderAgents() {
+            // Clear grid
+            agentGrid.innerHTML = '';
+            
+            // Show/hide no results message
+            if (filteredAgents.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                
+                // Create agent cards
+                filteredAgents.forEach((agent, index) => {
+                    const card = createAgentCard(agent, index);
+                    agentGrid.appendChild(card);
+                });
+            }
+        }
+
+        // Create agent card
+        function createAgentCard(agent, index) {
+            const isAwardWinner = Boolean(agent['2024_award_winner']);
+            
+            // Create card container
+            const card = document.createElement('div');
+            card.className = 'agent-card';
+            
+            // Add award badge if applicable
+            if (isAwardWinner) {
+                const awardBadge = document.createElement('div');
+                awardBadge.className = 'award-badge';
+                awardBadge.textContent = agent['2024_award_winner'];
+                card.appendChild(awardBadge);
+            }
+            
+            // Add headshot
+            const headshotContainer = document.createElement('div');
+            headshotContainer.className = 'headshot-container';
+            
+            if (agent.headshot) {
+                const headshot = document.createElement('img');
+                headshot.className = 'headshot';
+                headshot.src = agent.headshot;
+                headshot.alt = `${agent.name}`;
+                headshot.setAttribute('data-src', agent.headshot);
+                headshot.onerror = function() {
+                    this.parentNode.innerHTML = `<div class="placeholder-avatar">👤</div>`;
+                };
+                headshotContainer.appendChild(headshot);
+                
+                // Image actions (download)
+                const imageActions = document.createElement('div');
+                imageActions.className = 'image-actions';
+                
+                const downloadBtn = document.createElement('div');
+                downloadBtn.className = 'image-action-btn';
+                downloadBtn.innerHTML = '<i class="fa-download fas"></i>';
+                downloadBtn.addEventListener('click', function() {
+                    downloadImage(agent.headshot, `${agent.name.replace(/\s+/g, '-')}-headshot.jpg`, headshotContainer);
+                });
+                
+                const tooltip = document.createElement('div');
+                tooltip.className = 'image-action-tooltip';
+                tooltip.textContent = 'Download image';
+                
+                imageActions.appendChild(downloadBtn);
+                imageActions.appendChild(tooltip);
+                headshotContainer.appendChild(imageActions);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'placeholder-avatar';
+                placeholder.textContent = '👤';
+                headshotContainer.appendChild(placeholder);
+            }
+            
+            card.appendChild(headshotContainer);
+            
+            // Add agent info
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'agent-info';
+            
+            // Name
+            const name = document.createElement('h3');
+            name.className = 'agent-name';
+            name.textContent = agent.name || 'N/A';
+            infoContainer.appendChild(name);
+            
+            // Role and accreditations
+            const roleContainer = document.createElement('p');
+            roleContainer.className = 'agent-role';
+            roleContainer.textContent = agent.role || 'Agent';
+            
+            if (agent.accreditations && agent.accreditations !== 'Not Found') {
+                const accreditation = document.createElement('span');
+                accreditation.className = 'accreditation';
+                accreditation.textContent = agent.accreditations;
+                roleContainer.appendChild(accreditation);
+            }
+            
+            infoContainer.appendChild(roleContainer);
+            
+            // License info - Now in the card body instead of as a badge
+            if (agent.license_number) {
+                const licenseContainer = document.createElement('div');
+                licenseContainer.className = 'mt-1 mb-3';
+                
+                const licenseTag = document.createElement('div');
+                licenseTag.className = 'license-info';
+                
+                // Format depends on whether we have state info or just license number
+                if (agent.license_state) {
+                    licenseTag.innerHTML = `<i class="fa-id-card fas mr-1"></i>${agent.license_state} License #${agent.license_number}`;
+                } else {
+                    licenseTag.innerHTML = `<i class="fa-id-card fas mr-1"></i>License #${agent.license_number}`;
+                }
+                
+                licenseContainer.appendChild(licenseTag);
+                infoContainer.appendChild(licenseContainer);
+            }
+            
+            // Languages (if available)
+            if (agent.languages && agent.languages.trim()) {
+                const languagesContainer = document.createElement('div');
+                languagesContainer.className = 'mb-2';
+                
+                // Split languages by comma if multiple
+                const languagesList = agent.languages.split(',').map(lang => lang.trim()).filter(Boolean);
+                
+                languagesList.forEach(lang => {
+                    const langSpan = document.createElement('span');
+                    langSpan.className = 'languages';
+                    langSpan.innerHTML = `<i class="fa-language fas mr-1"></i>${lang}`;
+                    languagesContainer.appendChild(langSpan);
+                    
+                    // Add space between language tags
+                    const space = document.createTextNode(' ');
+                    languagesContainer.appendChild(space);
+                });
+                
+                infoContainer.appendChild(languagesContainer);
+            }
+            
+            // Location info
+            const locationInfo = document.createElement('div');
+            locationInfo.className = 'mb-3 pb-3 border-b border-gray-200';
+            
+            if (agent.region) {
+                const region = document.createElement('p');
+                region.className = 'text-sm text-gray-600';
+                region.innerHTML = `<span class="font-semibold">Region:</span> ${agent.region}`;
+                locationInfo.appendChild(region);
+            }
+            
+            if (agent.office_name) {
+                const office = document.createElement('p');
+                office.className = 'text-sm text-gray-600';
+                office.innerHTML = `<span class="font-semibold">Office:</span> ${agent.office_name}`;
+                locationInfo.appendChild(office);
+            }
+            
+            infoContainer.appendChild(locationInfo);
+            
+            // Contact info
+            const contactInfo = document.createElement('div');
+            contactInfo.className = 'contact-info';
+            
+            if (agent.cell_phone) {
+                const phone = document.createElement('p');
+                phone.className = 'mb-1';
+                phone.innerHTML = `
+                    <a href="tel:${agent.cell_phone.replace(/[^\d]/g, '')}">
+                        <span class="contact-icon">📱</span>
+                        ${agent.cell_phone}
+                    </a>
+                `;
+                contactInfo.appendChild(phone);
+            }
+            
+            if (agent.email) {
+                const email = document.createElement('p');
+                email.className = 'mb-1 truncate';
+                email.innerHTML = `
+                    <a href="mailto:${agent.email}">
+                        <span class="contact-icon">✉️</span>
+                        ${agent.email}
+                    </a>
+                `;
+                contactInfo.appendChild(email);
+            }
+            
+            infoContainer.appendChild(contactInfo);
+            card.appendChild(infoContainer);
+            
+            return card;
+        }
+
+        // Download image function
+        async function downloadImage(url, fileName, containerElement) {
+            // Add downloading state
+            containerElement.classList.add('downloading');
+            
+            try {
+                // Fetch the image
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                // Get the blob data
+                const blob = await response.blob();
+                
+                // Create a link element to trigger download
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                
+                // Append to body and click to trigger download
+                document.body.appendChild(link);
+                link.click();
+                
+                // Clean up
+                document.body.removeChild(link);
+                showToast(`Image downloaded as ${fileName}`, 'success');
+            } catch (error) {
+                showToast(`Error downloading image: ${error.message}`, 'error');
+            } finally {
+                // Remove downloading state
+                containerElement.classList.remove('downloading');
+            }
+        }
+
+        // Open upload modal
+        function openUploadModal() {
+            uploadModal.style.display = 'block';
+        }
+
+        // Close upload modal
+        function closeUploadModal() {
+            uploadModal.style.display = 'none';
+        }
+
+        // Handle file selection
+        function handleFileSelection(file) {
+            // Check if it's a CSV file
+            if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+                showToast('Please select a CSV file.', 'error');
+                return;
+            }
+            
+            // Store the selected file
+            selectedFile = file;
+            
+            // Update file info
+            fileInfo.classList.remove('hidden');
+            fileName.textContent = `File: ${file.name}`;
+            fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+            
+            // Enable upload button
+            uploadFileBtn.disabled = false;
+        }
+
+        // Process uploaded file
+        function processUploadedFile() {
+            if (!selectedFile) {
+                showToast('Please select a CSV file first.', 'error');
+                return;
+            }
+            
+            // Read the file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvText = e.target.result;
+                parseCSV(csvText, true);
+            };
+            reader.onerror = function() {
+                showToast('Error reading file.', 'error');
+            };
+            reader.readAsText(selectedFile);
+        }
+
+        // Clear upload form
+        function clearUploadForm() {
+            selectedFile = null;
+            csvFileInput.value = '';
+            fileInfo.classList.add('hidden');
+            fileName.textContent = '';
+            fileSize.textContent = '';
+            uploadFileBtn.disabled = true;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            // Set toast content and style
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            // Show toast
+            toast.style.display = 'block';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message) {
+            loadingElement.classList.add('hidden');
+            errorContainer.classList.remove('hidden');
+            errorMessage.textContent = message;
+        }
+
+        // Initialize app
+        loadCSV();
+    </script>
+</body>
+</html>
